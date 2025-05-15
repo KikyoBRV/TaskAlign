@@ -1,5 +1,3 @@
-# ga_scheduler.py
-
 import random
 
 def random_schedule(components):
@@ -106,3 +104,66 @@ def ga_optimize(components, machines, pop_size=20, n_generations=50, mutation_ra
     best_idx = fitnesses.index(max(fitnesses))
     best_schedule = decoded[best_idx]
     return best_schedule
+
+def greedy_jobshop_scheduler(components, machines):
+    """
+    Greedy job shop scheduler: always schedules the next available task whose prerequisites are met,
+    on the earliest available machine(s) that can process it.
+    """
+    import copy
+    from collections import defaultdict
+
+    # Copy to avoid mutating original data
+    components = copy.deepcopy(components)
+    machines = copy.deepcopy(machines)
+
+    # Map machine name to next available time
+    machine_available = {m.name: 0 for m in machines}
+    # Track when each component is finished
+    component_end = {}
+    # Track which components are scheduled
+    scheduled = set()
+    # For output: {comp_id: (start, end, name, [machines])}
+    schedule = {}
+
+    # Build a lookup for components by id
+    comp_by_id = {c.id: c for c in components}
+
+    # While there are unscheduled components
+    while len(scheduled) < len(components):
+        # Find all ready components (prereqs met and not scheduled)
+        ready = []
+        for c in components:
+            if c.id in scheduled:
+                continue
+            if all(pr in scheduled for pr in c.prerequisites):
+                ready.append(c)
+
+        # If no ready tasks (should not happen if no circular deps)
+        if not ready:
+            raise Exception("No schedulable tasks found (possible circular dependency)")
+
+        # For each ready component, find earliest start time (all required machines available)
+        best_c = None
+        best_start = None
+        for c in ready:
+            prereq_end = max([component_end[pr] for pr in c.prerequisites], default=0)
+            start = prereq_end
+            for m_name in c.required_machines:
+                start = max(start, machine_available[m_name])
+            if (best_start is None) or (start < best_start):
+                best_start = start
+                best_c = c
+
+        # Schedule the best component
+        c = best_c
+        start = best_start
+        end = start + c.total_time
+        for m_name in c.required_machines:
+            m = next(m for m in machines if m.name == m_name)
+            machine_available[m_name] = end + m.cooldown
+        component_end[c.id] = end
+        schedule[c.id] = (start, end, c.name, c.required_machines)
+        scheduled.add(c.id)
+
+    return schedule
