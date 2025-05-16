@@ -43,6 +43,14 @@ TaskAlign is a task scheduling system designed for conventional electronic equip
    - Displays a clear production roadmap, helping managers track daily tasks and machine utilization.
    - Allows users to adjust schedules manually if needed.
 
+
+---
+
+## Installation and Testing
+
+For detailed documentation, theoretical background, and how to run the test, please visit the [Factory Scheduling Experiment Wiki](../../wiki/Factory%20Scheduling%20Experiment).
+
+
 ---
 
 ## Learn More
