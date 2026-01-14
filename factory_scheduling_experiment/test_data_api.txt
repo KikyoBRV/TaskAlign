@@ -1,0 +1,49 @@
+{
+  "month_days": 10,
+  "machines": [
+    { "id": "M1", "name": "IMM-100", "group": "small", "tonnage": 100, "hours_per_day": 21, "efficiency": 0.85 },
+    { "id": "M2", "name": "IMM-180", "group": "medium", "tonnage": 180, "hours_per_day": 21, "efficiency": 0.85 }
+  ],
+  "molds": [
+    { "id": "MO1", "name": "Mold-A", "group": "small", "tonnage": 90 },
+    { "id": "MO2", "name": "Mold-B", "group": "medium", "tonnage": 150 }
+  ],
+  "components": [
+    {
+      "id": "C1",
+      "name": "Part-Red",
+      "quantity": 2000,
+      "cycle_time_sec": 12,
+      "mold_id": "MO1",
+      "color": "red",
+      "due_day": 7,
+      "lead_time_days": 2,
+      "prerequisites": []
+    },
+    {
+      "id": "C2",
+      "name": "Part-Blue",
+      "quantity": 1200,
+      "cycle_time_sec": 15,
+      "mold_id": "MO1",
+      "color": "blue",
+      "due_day": 9,
+      "lead_time_days": 2,
+      "prerequisites": []
+    },
+    {
+      "id": "C3",
+      "name": "Assy-Uses-C1",
+      "quantity": 500,
+      "cycle_time_sec": 20,
+      "mold_id": "MO2",
+      "color": "black",
+      "due_day": 10,
+      "lead_time_days": 2,
+      "prerequisites": ["C1"]
+    }
+  ],
+  "pop_size": 30,
+  "n_generations": 80,
+  "mutation_rate": 0.25
+}
