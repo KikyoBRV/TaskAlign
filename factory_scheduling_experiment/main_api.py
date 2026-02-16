@@ -1,17 +1,13 @@
 # main_api.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
-from factory_scheduling_experiment.models import Machine, Mold, ProductComponent
-from factory_scheduling_experiment.ga_scheduler import ga_optimize_v2
+from models import Machine, Mold, ProductComponent
+from ga_scheduler import ga_optimize_v2
 
 app = FastAPI(title="Injection Molding Monthly Planning API")
 
-
-# ----------------------------
-# Pydantic Schemas (Input)
-# ----------------------------
 
 class MachineIn(BaseModel):
     id: str
@@ -44,6 +40,10 @@ class ComponentIn(BaseModel):
 
 class ScheduleV2Request(BaseModel):
     month_days: int = 30
+
+    mold_change_time_hours: float = 0.0
+    color_change_time_hours: float = 0.0
+
     machines: List[MachineIn]
     molds: List[MoldIn]
     components: List[ComponentIn]
@@ -52,10 +52,6 @@ class ScheduleV2Request(BaseModel):
     n_generations: int = 80
     mutation_rate: float = 0.25
 
-
-# ----------------------------
-# API Endpoint
-# ----------------------------
 
 @app.post("/schedule_v2")
 def schedule_v2(request: ScheduleV2Request) -> Dict[str, Any]:
@@ -69,6 +65,8 @@ def schedule_v2(request: ScheduleV2Request) -> Dict[str, Any]:
             machines=machines,
             molds=molds,
             month_days=request.month_days,
+            mold_change_time_hours=request.mold_change_time_hours,
+            color_change_time_hours=request.color_change_time_hours,
             pop_size=request.pop_size,
             n_generations=request.n_generations,
             mutation_rate=request.mutation_rate,
